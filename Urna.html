@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width= , initial-scale=1.0">
+    <link href="Urna.css" rel="stylesheet">
+    
+    <title>Urna Eletrônica</title>
+
+</head>
+<body>
+    <header class = "head">
+       <h1>Eleições de Representante</h1>
+       <h1><b>2025</b></h1>
+    </header>
+
+    <button id="iniciarBtn">Iniciar votação</button>
+     <div class="container">
+      <div class="resultado">
+        <h1>Resultado da Votação</h1>    
+      </div>    
+    </div>
+    <script>
+      function cadastroCandidatos() {
+        let numCandidatos = parseInt(prompt("Digite o número de candidatos:"));
+        while (isNaN(numCandidatos) || numCandidatos <= 0) {
+          numCandidatos = parseInt(prompt("Número inválido. Digite o número de candidatos:"));
+        }
+        let candidatos = [];
+        for (let i = 0; i < numCandidatos; i++) {
+          let nome = prompt(`Digite o nome do ${i + 1}º candidato:`);
+          while (!nome || nome.trim() === "") {
+            nome = prompt(`Nome inválido. Digite o nome do ${i + 1}º candidato:`);
+          }
+          candidatos.push({ numero: i + 1, nome: nome.trim(), votos: 0 });
+        }
+        return candidatos;
+      }
+
+      function votacao(candidatos) {
+        let continuar = true;
+        let votantes = [];
+        while (continuar) {
+          let codigoCidadao = prompt("Digite o seu número de votação (ou 'fim' para encerrar):");
+          if (!codigoCidadao) {
+            alert("Código inválido!");
+            continue;
+          }
+
+          if (codigoCidadao.toLowerCase() === "fim") {
+            continuar = false;
+            break;
+          }
+          if (votantes.includes(codigoCidadao)) {
+            alert("Este código já votou!");
+            continue;
+          }
+          let mensagem = "Candidatos:\n";
+          for (let c of candidatos) {
+            mensagem += `Candidato ${c.numero} - ${c.nome}\n`;
+          }
+          alert(mensagem);
+
+          let voto = parseInt(prompt("Digite o número do candidato em quem deseja votar:"));
+
+          let candidatoEscolhido = candidatos.find(c => c.numero === voto);
+
+          if (candidatoEscolhido) {
+            candidatoEscolhido.votos++;
+            votantes.push(codigoCidadao);
+            alert(`Voto registrado para ${candidatoEscolhido.nome}!`);
+          } else {
+            alert("Número de candidato inválido. Tente novamente.");
+          }
+        }
+      }
+
+      function mostrarResultado(candidatos) {
+        let totalVotos = 0;
+        for (let c of candidatos) {
+          totalVotos += c.votos;
+        }
+        let mensagem = "<h2>RESULTADO FINAL:</h2>";
+        let maisVotado = candidatos[0];
+        for (let c of candidatos) {
+          let percentual = totalVotos > 0 ? ((c.votos / totalVotos) * 100).toFixed(2) : 0;
+          mensagem += `<p>${c.nome} - ${c.votos} votos (${percentual}%)</p>`;
+          if (c.votos > maisVotado.votos) {
+            maisVotado = c;
+          }
+        }
+        let empatados = candidatos.filter(c => c.votos === maisVotado.votos);
+
+        if (empatados.length > 1) {
+          mensagem += "<h3>EMPATE entre:</h3><ul>";
+          for (let c of empatados) {
+            mensagem += `<li>${c.nome}</li>`;
+          }
+          mensagem += "</ul>";
+        } else {
+          mensagem += `<h3>VENCEDOR: ${maisVotado.nome}</h3>`;
+        }
+
+        // Exibe o resultado dentro do container
+        document.querySelector('.resultado').innerHTML = mensagem;
+      }
+
+      function iniciarVotacao() {
+        let candidatos = cadastroCandidatos();
+        votacao(candidatos);
+        mostrarResultado(candidatos);
+      }
+
+      document.getElementById('iniciarBtn').addEventListener('click', iniciarVotacao);
+    </script>
+</body>
+</html>
